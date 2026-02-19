@@ -1,36 +1,30 @@
 {
   "name": "ai-tools-hub",
-  "version": "1.0.0",
-  "description": "AI Tools Hub - 9款AI工具桌面版",
-  "main": "main.js",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-builder",
-    "build:win": "electron-builder --win",
-    "build:mac": "electron-builder --mac",
-    "build:linux": "electron-builder --linux"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "electron": "electron ."
   },
-  "author": "AI Tools Hub",
-  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "framer-motion": "^11.0.0",
+    "zustand": "^4.5.0",
+    "lucide-react": "^0.344.0"
+  },
   "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.9.1"
-  },
-  "build": {
-    "appId": "com.aitools.hub",
-    "productName": "AI Tools Hub",
-    "directories": {
-      "output": "dist"
-    },
-    "files": ["**/*", "!node_modules/*/{CHANGELOG.md,README.md,readme.md}"],
-    "win": {
-      "target": "nsis"
-    },
-    "mac": {
-      "target": "dmg"
-    },
-    "linux": {
-      "target": "AppImage"
-    }
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.1.0",
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "electron": "^40.0.0"
   }
 }

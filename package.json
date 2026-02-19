@@ -1,0 +1,36 @@
+{
+  "name": "ai-tools-hub",
+  "version": "1.0.0",
+  "description": "AI Tools Hub - 9款AI工具桌面版",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "author": "AI Tools Hub",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.aitools.hub",
+    "productName": "AI Tools Hub",
+    "directories": {
+      "output": "dist"
+    },
+    "files": ["**/*", "!node_modules/*/{CHANGELOG.md,README.md,readme.md}"],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}

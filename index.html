@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tools Hub</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h1 { text-align: center; color: white; margin-bottom: 10px; font-size: 28px; }
+    .subtitle { text-align: center; color: rgba(255,255,255,0.9); margin-bottom: 30px; }
+    .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+    .tool-card { 
+      background: white; 
+      padding: 20px; 
+      border-radius: 12px; 
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-align: center;
+    }
+    .tool-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .tool-card.active { ring: 3px solid #667eea; }
+    .tool-icon { font-size: 36px; margin-bottom: 10px; }
+    .tool-name { font-weight: bold; color: #333; }
+    .tool-desc { font-size: 12px; color: #666; margin-top: 5px; }
+    .workspace { 
+      background: white; 
+      border-radius: 12px; 
+      padding: 24px; 
+      display: none;
+    }
+    .workspace.show { display: block; }
+    .back-btn { background: none; border: none; color: #667eea; cursor: pointer; font-size: 14px; margin-bottom: 16px; }
+    .workspace h2 { margin-bottom: 16px; color: #333; }
+    textarea { 
+      width: 100%; 
+      height: 120px; 
+      padding: 12px; 
+      border: 1px solid #ddd; 
+      border-radius: 8px; 
+      resize: none;
+      font-size: 14px;
+    }
+    .btn { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .output { 
+      margin-top: 20px; 
+      padding: 16px; 
+      background: #f5f5f5; 
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .version { text-align: center; color: rgba(255,255,255,0.6); margin-top: 20px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 AI Tools Hub</h1>
+    <p class="subtitle">9款AI工具，一站式解决方案 | 桌面版 v1.0</p>
+
+    <div class="tools-grid" id="toolsGrid"></div>
+
+    <div class="workspace" id="workspace">
+      <button class="back-btn" onclick="showTools()">← 返回工具列表</button>
+      <h2 id="workspaceTitle"></h2>
+      <textarea id="input" placeholder="输入您的需求..."></textarea>
+      <button class="btn" id="generateBtn" onclick="generate()">生成内容</button>
+      <div class="output" id="output"></div>
+    </div>
+
+    <p class="version">Made with ❤️ | AI Tools Hub v1.0.0</p>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const tools = [
+      { id: 'report', name: 'AI 报告生成', icon: '📊', desc: '可行性研究、商业计划' },
+      { id: 'video', name: 'AI 视频脚本', icon: '🎬', desc: 'YouTube、TikTok脚本' },
+      { id: 'novel', name: 'AI 小说写作', icon: '📚', desc: '角色开发、情节大纲' },
+      { id: 'course', name: 'AI 课程设计', icon: '📝', desc: '在线课程、培训大纲' },
+      { id: 'language', name: 'AI 语言学习', icon: '🌍', desc: '对话练习、语法词汇' },
+      { id: 'business', name: 'AI 商业计划', icon: '🏢', desc: '投资人级商业计划书' },
+      { id: 'competitor', name: 'AI 竞品分析', icon: '📈', desc: '竞争分析、SWOT' },
+      { id: 'sales', name: 'AI 销售分析', icon: '💰', desc: '趋势预测、销售洞察' },
+      { id: 'user', name: 'AI 用户分析', icon: '👥', desc: '行为模式、转化优化' }
+    ];
+
+    let currentTool = null;
+
+    // 渲染工具列表
+    function renderTools() {
+      const grid = document.getElementById('toolsGrid');
+      grid.innerHTML = tools.map(t => `
+        <div class="tool-card" onclick="selectTool('${t.id}')">
+          <div class="tool-icon">${t.icon}</div>
+          <div class="tool-name">${t.name}</div>
+          <div class="tool-desc">${t.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    function selectTool(id) {
+      currentTool = tools.find(t => t.id === id);
+      document.getElementById('toolsGrid').style.display = 'none';
+      document.getElementById('workspace').classList.add('show');
+      document.getElementById('workspaceTitle').textContent = `${currentTool.icon} ${currentTool.name}`;
+      document.getElementById('input').value = '';
+      document.getElementById('output').textContent = '';
+    }
+
+    function showTools() {
+      document.getElementById('toolsGrid').style.display = 'grid';
+      document.getElementById('workspace').classList.remove('show');
+      currentTool = null;
+    }
+
+    async function generate() {
+      const input = document.getElementById('input').value;
+      if (!input.trim()) return;
+
+      const btn = document.getElementById('generateBtn');
+      const output = document.getElementById('output');
+      
+      btn.disabled = true;
+      btn.textContent = '生成中...';
+      output.textContent = '正在生成内容，请稍候...';
+
+      try {
+        const result = await ipcRenderer.invoke('generate', { tool: currentTool.id, input });
+        output.textContent = result;
+      } catch (e) {
+        output.textContent = '生成失败：' + e.message;
+      }
+
+      btn.disabled = false;
+      btn.textContent = '生成内容';
+    }
+
+    renderTools();
+  </script>
+</body>
+</html>

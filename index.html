@@ -4,114 +4,351 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Tools Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 20px;
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --accent: #06b6d4;
+      --bg-dark: #0f172a;
+      --bg-card: rgba(30, 41, 59, 0.8);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: rgba(148, 163, 184, 0.1);
+      --glow: rgba(99, 102, 241, 0.5);
     }
-    .container { max-width: 1000px; margin: 0 auto; }
-    h1 { text-align: center; color: white; margin-bottom: 10px; font-size: 28px; }
-    .subtitle { text-align: center; color: rgba(255,255,255,0.9); margin-bottom: 30px; }
-    .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-    .tool-card { 
-      background: white; 
-      padding: 20px; 
-      border-radius: 12px; 
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      min-height: 100vh;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* 动态背景 */
+    .bg-gradient {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: 
+        radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.15), transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.15), transparent 50%),
+        radial-gradient(ellipse at center, rgba(6, 182, 212, 0.1), transparent 70%);
+      z-index: -1;
+    }
+
+    /* 头部 */
+    .header {
+      padding: 40px 20px 20px;
       text-align: center;
     }
-    .tool-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-    .tool-card.active { ring: 3px solid #667eea; }
-    .tool-icon { font-size: 36px; margin-bottom: 10px; }
-    .tool-name { font-weight: bold; color: #333; }
-    .tool-desc { font-size: 12px; color: #666; margin-top: 5px; }
-    .workspace { 
-      background: white; 
-      border-radius: 12px; 
-      padding: 24px; 
-      display: none;
+    
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
     }
-    .workspace.show { display: block; }
-    .back-btn { background: none; border: none; color: #667eea; cursor: pointer; font-size: 14px; margin-bottom: 16px; }
-    .workspace h2 { margin-bottom: 16px; color: #333; }
-    textarea { 
-      width: 100%; 
-      height: 120px; 
-      padding: 12px; 
-      border: 1px solid #ddd; 
-      border-radius: 8px; 
-      resize: none;
+    
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 8px 32px var(--glow);
+    }
+    
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+    
+    .subtitle {
+      color: var(--text-muted);
       font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.5px;
     }
-    .btn { 
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
+
+    /* 工具网格 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .tool-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+
+    .tool-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--primary);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 40px var(--glow);
+    }
+
+    .tool-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .tool-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .tool-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* 工作区 */
+    .workspace {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .workspace.show { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .workspace-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: var(--primary);
+      padding: 10px 20px;
+      border-radius: 12px;
       cursor: pointer;
       font-size: 14px;
-      margin-top: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+      margin-bottom: 24px;
     }
-    .btn:hover { opacity: 0.9; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .output { 
-      margin-top: 20px; 
-      padding: 16px; 
-      background: #f5f5f5; 
-      border-radius: 8px;
+
+    .back-btn:hover {
+      background: rgba(99, 102, 241, 0.2);
+      transform: translateX(-4px);
+    }
+
+    .workspace-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .workspace-header .tool-icon {
+      margin-bottom: 0;
+    }
+
+    .workspace-header h2 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    textarea {
+      width: 100%;
+      height: 140px;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      resize: none;
+      transition: all 0.2s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 20px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px var(--glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--glow);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .output {
+      margin-top: 24px;
+      padding: 24px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       white-space: pre-wrap;
       font-size: 14px;
-      line-height: 1.6;
+      line-height: 1.8;
+      color: var(--text);
     }
-    .version { text-align: center; color: rgba(255,255,255,0.6); margin-top: 20px; font-size: 12px; }
+
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* 响应式 */
+    @media (max-width: 900px) {
+      .tools-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    @media (max-width: 600px) {
+      .tools-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🚀 AI Tools Hub</h1>
-    <p class="subtitle">9款AI工具，一站式解决方案 | 桌面版 v1.0</p>
+  <div class="bg-gradient"></div>
+  
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+    </div>
+    <h1>AI Tools Hub</h1>
+    <p class="subtitle">9款专业AI工具 · 一站式智能解决方案</p>
+  </div>
 
+  <div class="container">
     <div class="tools-grid" id="toolsGrid"></div>
 
     <div class="workspace" id="workspace">
-      <button class="back-btn" onclick="showTools()">← 返回工具列表</button>
-      <h2 id="workspaceTitle"></h2>
-      <textarea id="input" placeholder="输入您的需求..."></textarea>
-      <button class="btn" id="generateBtn" onclick="generate()">生成内容</button>
-      <div class="output" id="output"></div>
+      <div class="workspace-card">
+        <button class="back-btn" onclick="showTools()">
+          <span>←</span> 返回
+        </button>
+        <div class="workspace-header">
+          <div class="tool-icon" id="workspaceIcon"></div>
+          <h2 id="workspaceTitle"></h2>
+        </div>
+        <textarea id="input" placeholder="描述您的需求，AI 将为您生成专业内容..."></textarea>
+        <button class="btn-primary" id="generateBtn" onclick="generate()">
+          <span>✨</span>
+          <span id="btnText">生成内容</span>
+        </button>
+        <div class="output" id="output"></div>
+      </div>
     </div>
+  </div>
 
-    <p class="version">Made with ❤️ | AI Tools Hub v1.0.0</p>
+  <div class="footer">
+    AI Tools Hub v1.0.0 · Powered by DeepSeek AI
   </div>
 
   <script>
     const { ipcRenderer } = require('electron');
 
     const tools = [
-      { id: 'report', name: 'AI 报告生成', icon: '📊', desc: '可行性研究、商业计划' },
-      { id: 'video', name: 'AI 视频脚本', icon: '🎬', desc: 'YouTube、TikTok脚本' },
-      { id: 'novel', name: 'AI 小说写作', icon: '📚', desc: '角色开发、情节大纲' },
-      { id: 'course', name: 'AI 课程设计', icon: '📝', desc: '在线课程、培训大纲' },
-      { id: 'language', name: 'AI 语言学习', icon: '🌍', desc: '对话练习、语法词汇' },
-      { id: 'business', name: 'AI 商业计划', icon: '🏢', desc: '投资人级商业计划书' },
-      { id: 'competitor', name: 'AI 竞品分析', icon: '📈', desc: '竞争分析、SWOT' },
-      { id: 'sales', name: 'AI 销售分析', icon: '💰', desc: '趋势预测、销售洞察' },
-      { id: 'user', name: 'AI 用户分析', icon: '👥', desc: '行为模式、转化优化' }
+      { id: 'report', name: '报告生成', icon: '📊', desc: '可行性研究 · 商业计划 · 市场调研', color: '#6366f1' },
+      { id: 'video', name: '视频脚本', icon: '🎬', desc: 'YouTube · TikTok · 短视频脚本', color: '#8b5cf6' },
+      { id: 'novel', name: '小说写作', icon: '📚', desc: '角色开发 · 情节大纲 · 章节草稿', color: '#a855f7' },
+      { id: 'course', name: '课程设计', icon: '📝', desc: '在线课程 · 培训大纲 · 教学设计', color: '#06b6d4' },
+      { id: 'language', name: '语言学习', icon: '🌍', desc: '对话练习 · 语法讲解 · 词汇训练', color: '#14b8a6' },
+      { id: 'business', name: '商业计划', icon: '🏢', desc: '投资人级商业计划书', color: '#f59e0b' },
+      { id: 'competitor', name: '竞品分析', icon: '📈', desc: '竞争对手分析 · SWOT · 策略', color: '#ef4444' },
+      { id: 'sales', name: '销售分析', icon: '💰', desc: '趋势预测 · 机会识别 · 销售洞察', color: '#22c55e' },
+      { id: 'user', name: '用户分析', icon: '👥', desc: '行为模式 · 转化优化 · 用户画像', color: '#3b82f6' }
     ];
 
     let currentTool = null;
 
-    // 渲染工具列表
     function renderTools() {
       const grid = document.getElementById('toolsGrid');
       grid.innerHTML = tools.map(t => `
         <div class="tool-card" onclick="selectTool('${t.id}')">
-          <div class="tool-icon">${t.icon}</div>
+          <div class="tool-icon" style="background: linear-gradient(135deg, ${t.color}22, ${t.color}11); border-color: ${t.color}44;">
+            ${t.icon}
+          </div>
           <div class="tool-name">${t.name}</div>
           <div class="tool-desc">${t.desc}</div>
         </div>
@@ -122,7 +359,10 @@
       currentTool = tools.find(t => t.id === id);
       document.getElementById('toolsGrid').style.display = 'none';
       document.getElementById('workspace').classList.add('show');
-      document.getElementById('workspaceTitle').textContent = `${currentTool.icon} ${currentTool.name}`;
+      document.getElementById('workspaceIcon').innerHTML = currentTool.icon;
+      document.getElementById('workspaceIcon').style.background = `linear-gradient(135deg, ${currentTool.color}22, ${currentTool.color}11)`;
+      document.getElementById('workspaceIcon').style.borderColor = `${currentTool.color}44`;
+      document.getElementById('workspaceTitle').textContent = currentTool.name;
       document.getElementById('input').value = '';
       document.getElementById('output').textContent = '';
     }
@@ -138,21 +378,22 @@
       if (!input.trim()) return;
 
       const btn = document.getElementById('generateBtn');
+      const btnText = document.getElementById('btnText');
       const output = document.getElementById('output');
       
       btn.disabled = true;
-      btn.textContent = '生成中...';
-      output.textContent = '正在生成内容，请稍候...';
+      btnText.textContent = '生成中...';
+      output.textContent = '✨ AI 正在为您生成专业内容...';
 
       try {
         const result = await ipcRenderer.invoke('generate', { tool: currentTool.id, input });
         output.textContent = result;
       } catch (e) {
-        output.textContent = '生成失败：' + e.message;
+        output.textContent = '❌ 生成失败：' + e.message;
       }
 
       btn.disabled = false;
-      btn.textContent = '生成内容';
+      btnText.textContent = '生成内容';
     }
 
     renderTools();
